@@ -1,0 +1,9 @@
+== Feb 12. 2010
+ * Made initial solution for parsing YAML configuration file
+ * Next: Implement the Runner 
+  - should call Handler chain created after load 
+  - Chain should try each handler and find best match
+  - Then create signature file in the dir if good match found or go to next dir if no good match (See Design.txt)
+  
+ * Next II:
+  - Create new runner to run through dirs and handle signature files found, fx moving the dir to another location and/or updating database of apps.
