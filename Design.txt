@@ -1,0 +1,218 @@
+Hej Ole,
+
+Jeg er ved at designe min Directory traverser. Følgende design.
+
+ROOT
+  - projects
+  - apps
+    - cool_java : JAVA
+      - lib
+          apache.jar
+      - test
+          test_a.java
+    - my_web1 : JAVA WEB
+      - dk
+        - moonshine
+          - myweb
+              app.java
+      - WEB-INF
+          web.xml
+    - nice_ruby : RUBY
+      - lib
+          nice.rb
+          - helper
+              my_helper.rb
+
+    - good_rails_2 : RAILS 2
+      - app
+          models            
+              person.rb
+      - config
+          environment.rb
+
+    - good_rails_3 : RAILS 2
+      Gemfile
+      - app
+          models            
+              person.rb
+      - config
+          application.rb
+          environment.rb
+
+
+  - bash_dev
+    - database
+       database.sh
+      - mysql
+          mysql.sh
+    - ruby
+        gems.sh
+        
+Når jeg går ned igennem fra roden, går det ikke at jeg for hver folder ser om der er fx en .java fil i hele træet under.
+Så ville apps folderen blive matchet af alle Application Matchers.
+
+Hvis jeg max går et niveau ned og derefter ser mig omkring er det meget bedre (og meget hurtigere!)
+
+Apps folderen går ned i cool_java, ingen *.java fil der, ingen WEB-INF der osv. Apps folderen vil ikke blive fanget
+
+cool java - finder en lib folder der er spændende, finder her nogle .jar filer. Potentiel java app. Går ned i test folderen, finder en .java
+my_web1 - finder WEB-INF og herunder en web.xml - klart en Java web app!
+nic_ruby - finder en lib folder, går herned og finder en .rb - klart en Ruby app!
+
+bash_dev - går ned i database, finder en .sh fil, klart en shell app!
+
+Det ville sku virke!  
+ 
+Mit indledende Design er at have en klasse for hver type applikation der kan fanges, og så definere en matches funktion der tager et directory som parameter.            
+
+Men mon ikke jeg kunne benyte en YAML config fil?
+
+Alle App Dirs, markeres med en APP_DIR fil.
+
+En App kan også beta af flere typer apps, fx En Rails app med en Sproutcore app, eller en Java app med en Ruby osv. Polyglot programmering.
+I sådanne tilfælde markeres det som en samlet app med en APPLICATION fil.
+
+--
+
+Directory matchers:
+  App dir matchers:
+  App matchers:
+  Sub matchers:
+
+Split up in Matchers (YAML files) and Handlers (Ruby files)
+Each handler can be hooked up to one or more matchers.
+Each matcher can have a Chain of Handlers assigned.
+
+Directory matchers:
+  App dir matchers:
+  App matchers:
+  Sub matchers:
+
+Split up in Matchers (YAML files) and Handlers (Ruby files)
+Each Handler can be hooked up to one or more Matchers.
+Each Matcher can have a Chain of Handlers assigned.
+
+3 times run through directory tree
+1. Tries to mark each dir with best matching signature file.
+2. Only uses the signature files, and can rewrite signature files as needed with new info.
+3. Execute Dir handlers configured for each signature file found.
+
+--
+
+Templates
+Ruby:
+  - rybu files: *RUBY_FILES 
+    - [**/*.rb]
+  -
+    lib:  *RUBY_LIB
+      - 1: &RUBY_FILES
+      - 2: [*.rdoc]
+  -
+    test: *RUBY_TEST
+      - &RUBY_FILES
+  -
+    spec: *RUBY_SPEC
+      - &RUBY_FILES
+
+Java:      
+  -
+    lib: *JAVA_LIB
+      - 1:   [**/*.jar, **/*.java]
+
+Package Rules:
+Files filtered out: .txt, .html, no extension, SVN and CVS dirs 
+
+Java: At least 2 .java files, other files may only be .html
+Ruby: At least 2 .rb files, other files may only be .rdoc, .txt or without extension.
+
+PackageDirs:
+  Java:
+    - 1: .rb 2
+    - 2: .txt, .html, NOEXT, DOT
+  Ruby
+    - 1: .java 2
+    - 2: .txt, .html, .rdoc, NOEXT, DOT
+    
+
+
+Create Script to Sign all immediate folders with a common signature file!
+
+Application Dir:
+SIGNATURE: APP.DIR
+
+Web Application Dir:
+SIGNATURE: WEB.APP.DIR
+
+Html.yml
+EXTENSIONS: .html
+
+Java.yml
+EXTENSIONS: .java
+PACKAGE: *JavaPackage !
+DIR:
+	- lib [*.jar] !
+	- 
+	  test: *JavaPackage !
+
+SIGNATURE: JAVA.APP
+
+Effects: Mark all Java package structures as JAVA.PACKAGE in root of package.
+
+Ruby.yml
+EXTENSIONS: .rb
+DIR:
+	- &RUBY_LIB
+	- &RUBY_TEST
+	- 
+COUNT: 2 # just 2 filematches needed in dir with mostly rb files
+SIGNATURE: RUBY.APP
+
+Ruby_Gem.yml
+EXTEND: Ruby
+EXTENSIONS: .rb
+DIR: 
+  - [*.gemspec, *.gem]
+  -    
+    Rakefile: FILE !
+      - '/Gem/' # file content must match    
+	- lib [**/*.rb]
+SIGNATURE: RUBY.GEM
+
+Ruby_Jewel.yml
+EXTENSIONS: .rb
+EXTEND: Gem
+DIR: 
+  - [*.gemspec] 
+  -    
+    Rakefile: FILE !
+      - '/Jewel/' # file content must match    
+	- lib [*.rb]	
+	- pkg [*.gem] 
+SIGNATURE: RUBY.GEM.JEWEL
+
+
+Rails_2.yml
+EXTEND: Ruby
+DIR: 
+	config:
+		- environment.rb !
+SIGNATURE: RAILS.2.APP
+
+Rails_3.yml
+EXTEND: Rails_2
+DIR: 
+	config:
+		- environment.rb !
+		- application.rb !
+	Gemfile !
+SIGNATURE: RAILS.3.APP	
+
+Så behøver jeg slet ikke at lave klasser! Det hele kan konfigureres :)
+
+Så skal applikation matchers bare eavlueres i en fornuftig rækkefølge, de mest "krævende" først, fx Rails 3 før Rails 2 osv.
+Her benytter jeg EXTEND til at angive hvilke der er specialiseringer og dermed mere "krævende", og skal evalueres før den som extendes.
+
+Er det overdesign eller?
+
+Hilsen Kristian
+

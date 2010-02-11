@@ -1,0 +1,131 @@
+---
+
+Templates:
+    -
+        Ruby:
+            - 
+                ruby_files: &RUBY_FILES
+                    - include [**/*.rb]
+            -
+                lib:  &RUBY_LIB
+                    - *RUBY_FILES
+            -
+                test: &RUBY_TEST
+                    - *RUBY_FILES
+            -
+                spec: &RUBY_SPEC
+                    - *RUBY_FILES
+    -
+        Java:      
+            -
+                lib: &JAVA_LIB
+                    - include [**/*.jar, **/*.java]
+
+# only mark as a package dir if the files after excluding those matching 'exclude' 
+# only contain files matched by those in 'include'
+PackageDirs:
+    -
+        Java: &JAVA_PKG
+            - include [.java] # include only
+            - exclude [.txt, .html, NOEXT] # exclude
+    -
+        Ruby: &RUBY_PKG
+            - include [.rb] # include only
+            - exclude [.txt, .html, .rdoc, NOEXT] # exclude
+
+ApplicationDir:
+    -
+        SIGNATURE: APP
+
+WebApplicationDir:
+    -
+        SIGNATURE: APP.WEB
+
+Html:
+    -
+        EXTENSIONS: .html
+    - 
+        SIGNATURE: APP.HTML
+        
+
+Java:
+    -
+        EXTENSIONS: .java
+    -
+        DIR: 
+            -
+                Package: *JAVA_PKG             
+    -
+        SIGNATURE: APP.JAVA
+
+JavaWebApp:
+    -
+        EXTENSIONS: .java
+    -
+        DIR:
+            -
+                WEB-INF: &JAVA_LIB
+    -
+        SIGNATURE: APP.JAVA.WEB
+
+        
+Ruby: &RUBY
+    -
+        EXTENSIONS: .rb
+    - 
+        DIR:
+            - 
+                lib: *RUBY_LIB
+            - 
+                Package: *RUBY_PKG 
+    -
+        SIGNATURE: RUBY.APP
+
+Ruby_Gem: &RUBY_GEM
+    -
+        EXTEND: Ruby
+    -
+        EXTENSIONS: .rb
+    -
+        DIR: 
+            -    
+                Rakefile: FILE !
+                    - '/Gem/' # file content must match    
+    -    
+        SIGNATURE: RUBY.GEM
+
+Ruby_Jewel:
+    -
+        EXTENSIONS: .rb
+    -
+        EXTEND: *RUBY_GEM
+    -
+        DIR: 
+            -    
+                Rakefile: FILE !
+                    - '/Jewel/' # file content must match    
+    -
+        SIGNATURE: RUBY.GEM.JEWEL
+
+
+Rails_2: &Rails_2
+    -
+        TYPE: Web
+    -
+        DIR: 
+            -
+                config:
+                    - environment.rb !
+    -
+        SIGNATURE: RAILS.2.APP
+
+Rails_3:
+    -
+        EXTEND: *Rails_2
+    -
+        TYPE: Web        
+    -
+        DIR: 
+            - Gemfile !
+    -
+        SIGNATURE: RAILS.3.APP        
