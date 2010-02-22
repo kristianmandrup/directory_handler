@@ -1,0 +1,18 @@
+---
+
+# move_to points can point to a path or an Environment variable that must be set to a valid system path
+
+Handlers:
+    -
+        APP.RUBY.WEB:
+            - 
+                move_to: APPS_RUBY_WEB  
+    -
+        APP.JAVA.WEB:
+            - 
+                move_to: APPS_JAVA_WEB  
+    -
+        RUBY.GEM:
+            - 
+                move_to: RUBY_GEMS  
+                

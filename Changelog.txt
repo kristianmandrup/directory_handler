@@ -1,3 +1,7 @@
+== Feb 13. 2010
+* Rename Package -> Main
+* Create configs for subdirs, fx TestUnit, Shoulda, Cucumber, MySQL, Mongo DB, ...
+
 == Feb 12. 2010
  * Made initial solution for parsing YAML configuration file
  * Next: Implement the Runner 

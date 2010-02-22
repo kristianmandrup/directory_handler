@@ -68,6 +68,12 @@ JavaWebApp:
     -
         SIGNATURE: APP.JAVA.WEB
 
+SinatraApp:
+    -
+        EXTENSIONS: .rb
+    -
+        SIGNATURE: APP.RUBY.WEB.SINATRA
+
         
 Ruby: &RUBY
     -
@@ -85,25 +91,42 @@ Ruby_Gem: &RUBY_GEM
     -
         EXTEND: Ruby
     -
+        TYPE: GEM        
+    -
         EXTENSIONS: .rb
     -
         DIR: 
             -    
-                Rakefile: FILE !
-                    - '/Gem/' # file content must match    
+                Rakefile: matches ['Gem::Specification.new']
     -    
         SIGNATURE: RUBY.GEM
+
+Ruby_Echoe_Gem:
+    -
+        EXTEND: Ruby
+    -
+        TYPE: GEM        
+    -
+        EXTENSIONS: .rb
+    -
+        DIR: 
+            -    
+                Rakefile: matches ['Echoe.new']
+    -    
+        SIGNATURE: RUBY.GEM.ECHOE
+
 
 Ruby_Jewel:
     -
         EXTENSIONS: .rb
     -
+        TYPE: GEM        
+    -
         EXTEND: *RUBY_GEM
     -
         DIR: 
             -    
-                Rakefile: FILE !
-                    - '/Jewel/' # file content must match    
+                Rakefile: matches ['Jeweler::Tasks.new'] 
     -
         SIGNATURE: RUBY.GEM.JEWEL
 
@@ -113,11 +136,9 @@ Rails_2: &Rails_2
         TYPE: Web
     -
         DIR: 
-            -
-                config:
-                    - environment.rb !
+            - config/environment.rb
     -
-        SIGNATURE: RAILS.2.APP
+        SIGNATURE: APP.RUBY.WEB.RAILS.2
 
 Rails_3:
     -
@@ -128,4 +149,4 @@ Rails_3:
         DIR: 
             - Gemfile !
     -
-        SIGNATURE: RAILS.3.APP        
+        SIGNATURE: APP.RUBY.WEB.RAILS.3
