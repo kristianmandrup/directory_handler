@@ -17,14 +17,20 @@ module AppIndx
     end
     
     def match?(path)
-      files = FileList["#{name}"]
-      return false if files.empty?
-      file = files[0]
+      return false if !match_file?(name) 
       return true if !matchings || matchings.empty?
       matchings.each do |matching|
         return true if IO.read(file) =~ matching
       end
       false
     end        
+    
+    def match_file?(name) 
+      all_files = FileList["**/*"]
+      all_files.each do |file|
+        return true if file =~ /^#{Regexp.escape(name)}$/       
+      end 
+      false      
+    end
   end
 end

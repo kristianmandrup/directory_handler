@@ -25,6 +25,9 @@ module AppIndx
     end
     
     def handle(path)
+      application_matchers.each do |matcher|
+        matcher.handle path
+      end
     end
   end   
   

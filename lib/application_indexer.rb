@@ -30,8 +30,7 @@ module AppIndx
           app_matcher.register value
         end    
       end
-    end
-    
+    end    
     
     def index(root_path) 
       app_handler.matchers = app_matcher.application_matchers

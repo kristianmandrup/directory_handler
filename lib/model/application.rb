@@ -1,6 +1,6 @@
 module AppIndx
   class Application
-    attr_accessor :extensions, :files, :signature, :package, :extend, :type
+    attr_accessor :extensions, :files, :signature, :package, :extends_app, :type
   
     def initialize(config)
       parse(config)
@@ -15,17 +15,18 @@ module AppIndx
     end
 
     # determine if directory matches this type of application
-    def handle(path)
-      return true if match_files? path        
-      return true if match_package? path
-      return false
+    def handle(path)   
+      return self if match_files? path        
+      # return true if match_package? path
+      return nil
     end
 
     def match_files?(path)
       return false if !files || files.empty?
-      files.each do |file_matcher|
-        file_matcher.match? path
+      files.each do |file_matcher| 
+        return false if !file_matcher.match? path
       end
+      return true
     end
 
     def match_package?(path)
@@ -56,8 +57,8 @@ module AppIndx
         @signature ||= value
       when 'TYPE'          
         @type ||= value            
-      when 'EXTEND'
-        @extend ||= value            
+      when 'EXTEND'  
+        @extends_app ||= Application.new(value)            
       else 
         puts "Unknown app key: #{key}"
       end                

@@ -75,7 +75,7 @@ SinatraApp:
         SIGNATURE: APP.RUBY.WEB.SINATRA
 
         
-Ruby: &RUBY
+RubyApp: &RUBY_APP
     -
         EXTENSIONS: .rb
     - 
@@ -89,7 +89,7 @@ Ruby: &RUBY
 
 Ruby_Gem: &RUBY_GEM
     -
-        EXTEND: Ruby
+        EXTEND: *RUBY_APP
     -
         TYPE: GEM        
     -
@@ -103,7 +103,7 @@ Ruby_Gem: &RUBY_GEM
 
 Ruby_Echoe_Gem:
     -
-        EXTEND: Ruby
+        EXTEND: *RUBY_APP
     -
         TYPE: GEM        
     -
@@ -131,7 +131,7 @@ Ruby_Jewel:
         SIGNATURE: RUBY.GEM.JEWEL
 
 
-Rails_2: &Rails_2
+Rails_2_App: &RAILS_2_APP
     -
         TYPE: Web
     -
@@ -140,13 +140,13 @@ Rails_2: &Rails_2
     -
         SIGNATURE: APP.RUBY.WEB.RAILS.2
 
-Rails_3:
+Rails_3_App:
     -
-        EXTEND: *Rails_2
+        EXTEND: *RAILS_2_APP
     -
         TYPE: Web        
     -
         DIR: 
-            - Gemfile !
+            - Gemfile
     -
         SIGNATURE: APP.RUBY.WEB.RAILS.3
