@@ -7,7 +7,10 @@ module AppIndx
     attr_accessor :application_matchers
           
     def self.remove_wrap(txt, prefix)
-      txt.gsub(/#{prefix}/, '').gsub(/\[|\]/, '')
+      txt = txt.gsub(/^#{prefix}/, '').gsub(/\[|\]/, '').strip
+      txt = txt.gsub /^\s*'/, ''
+      txt = txt.gsub /\s*'$/, ''      
+      txt
     end
     
     def register(config)   

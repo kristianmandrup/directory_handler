@@ -23,7 +23,7 @@ module AppIndx
 
     def match_files?(path)
       return false if !files || files.empty?
-      files.each do |file_matcher| 
+      files.each do |file_matcher|         
         return false if !file_matcher.match? path
       end
       return true
@@ -35,7 +35,7 @@ module AppIndx
 
 
     def parse(config)
-      config.each do |obj, value| 
+      config.each do |obj, value|
         case obj
         when Hash            
             obj.each do |key, value|             
@@ -68,34 +68,44 @@ module AppIndx
       @files ||= [] 
       dir.each do |obj, value| 
         case obj
-        when Hash            
-          obj.each do |key, value|             
-            case key
-            when 'Package'
-              @package = PackageMatcher.new value
-            when Hash
-              parse_dir_hash(obj) 
-            end                                          
-          end
+        when Hash        
+          parse_dir_hash(obj)
         else 
           @files << FileMatcher.new(obj)
         end
       end 
     end
 
-    def parse_dir_hash(config)                
+    def parse_special(key, value)
+      case key
+      when 'Package'
+        @package = PackageMatcher.new value
+      end
+    end
+    
+    def file_matcher?(value)
+      value.include?('FILE') || value.include?('matches')  
+    end
+
+    def parse_dir_hash(config)
       config.each do |obj, value|       
-        @files ||= []                      
-        if value.include?('FILE')
-          @files << FileMatcher.new(name, value)
-        elsif value.include?('matches')
-          @files << FileMatcher.new(name, value)          
-        else         
-          puts "parse_dir_hash:"
-          puts config 
-          # @files << config
+        @files ||= []                              
+        parse_special(obj, value)
+
+        parse_directory(value) if value.kind_of?(Hash)           
+        if value        
+          if file_matcher?(value)
+            @files << FileMatcher.new(obj, value)
+          else         
+            # puts "parse_dir_hash:"
+            # puts config 
+          end
         end
       end       
+    end
+
+    def parse_directory(dir)
+      # puts "parse_directory: #{dir}"
     end
 
     def to_s

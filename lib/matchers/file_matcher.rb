@@ -13,15 +13,16 @@ module AppIndx
         config.each{|obj| @matchings << obj}      
       else                 
         @matchings << ApplicationMatcher.remove_wrap(config, 'matches')
-      end
+      end       
     end
     
     def match?(path)
       return false if !match_file?(name) 
       return true if !matchings || matchings.empty?
       matchings.each do |matching|
-        return true if IO.read(file) =~ matching
-      end
+        return true if IO.read(name) =~ /#{Regexp.escape(matching)}/
+      end    
+
       false
     end        
     
